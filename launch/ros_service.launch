@@ -1,0 +1,40 @@
+<launch>
+
+  <arg name="output" default="screen" />
+  <arg name="respawn" default="false" />
+  
+  <arg name="www_port" default="8085" />
+  <arg name="websocket_port" default="9090" />
+  <arg name="script_path" default="$(find ros_service)/scripts" />
+
+  <group ns="ros_service">
+
+    <!-- watchdog -->
+    <arg name="enable_watchdog" default="false" />
+    <arg name="watchdog_name" value="watchdog" if="$(arg enable_watchdog)" />
+    <include file="$(find ros_watchdog)/launch/ros_watchdog.launch" if="$(arg enable_watchdog)"> 
+      <arg name="output" value="$(arg output)" />
+      <arg name="name" value="$(arg watchdog_name)" />
+    </include>
+
+    <!-- roswww server -->
+    <include file="$(find roswww)/launch/roswww.launch"> 
+      <arg name="port" value="$(arg www_port)" />
+    </include>
+
+    <!-- rosbridge_server -->
+    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch">
+      <arg name="output" value="$(arg output)" />
+      <arg name="port" value="$(arg websocket_port)" />
+    </include>
+
+    <!-- ros_shell -->
+    <include file="$(find ros_shell)/launch/ros_shell.launch">
+      <arg name="output" value="$(arg output)" />
+      <arg name="respawn" value="$(arg respawn)" />
+      <arg name="script_path" value="$(arg script_path)" />
+    </include>
+
+  </group>
+
+</launch>
